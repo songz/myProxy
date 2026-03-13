@@ -12,18 +12,14 @@ const handleDelete = data => {
 
 const MappingGroup = ({ mappings }) => {
   const port = mappings[0].port
-  const anyRunning = mappings.some(m => m.status === 'running')
-  const iconColor = anyRunning
-    ? 'rgba(50,255,50,0.5)'
-    : 'rgba(255,50,50,0.5)'
 
   return (
     <li className="list-group-item">
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: mappings.length > 1 ? '4px' : '0' }}>
-        <i
+        <img
           className="fa fa-circle mr-2"
-          style={{ fontSize: '15px', color: iconColor }}
-        ></i>
+          style={{ fontSize: '15px' }} 
+          src={`https://status.amayz.dev/api/status/${mappings[0].ip || "127.0.0.1"}:${port}.svg`} />
         <small className="form-text text-muted" style={{ margin: 0 }}>
           PORT: {port}
         </small>
