@@ -3,7 +3,9 @@ import express from 'express'
 import https from 'https'
 import httpProxy from 'http-proxy'
 import path from 'path'
+import fs from 'fs'
 import cookieParser from 'cookie-parser'
+import esbuild from 'esbuild'
 
 import { adminRouter } from '../admin/index'
 import { apiRouter } from '../api/index'
@@ -109,5 +111,31 @@ const startProxyServer = (): void => {
   })
   httpApp.listen(80)
 }
+
+const watchClientFiles = async (): Promise<void> => {
+  const srcDir = path.join(__dirname, '../../src/public')
+  const outDir = path.join(__dirname, '../public')
+  if (!fs.existsSync(srcDir)) return
+
+  const entryPoints = fs
+    .readdirSync(srcDir)
+    .filter(f => f.endsWith('.ts') || f.endsWith('.jsx'))
+    .map(f => path.join(srcDir, f))
+
+  if (entryPoints.length === 0) return
+
+  const ctx = await esbuild.context({
+    entryPoints,
+    bundle: false,
+    outdir: outDir,
+    loader: { '.jsx': 'jsx' }
+  })
+
+  await ctx.rebuild()
+  await ctx.watch()
+  console.log(cyan, 'Watching client files for changes...')
+}
+
+watchClientFiles().catch(err => console.error('esbuild watch error:', err))
 
 export { startProxyServer, startAppServer }

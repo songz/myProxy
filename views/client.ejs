@@ -13,72 +13,7 @@
        </a>
       </div>
    </div>
-  <div class="d-flex justify-content-between">
-    <div class="input-group mr-3 mb-2" style="min-width:250px;">
-      <input
-        type="text"
-        class="form-control subDomain"
-        id="subdomain"
-        placeholder="Subdomain"
-      />
-      <div class="input-group-append">
-        <button
-          type="button"
-          class="btn btn-outline-info dropdown-toggle"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-          id="hostSelector"
-          data-value=""
-        ></button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"></div>
-      </div>
-    </div>
-    <div class="input-group mr-3 mb-2">
-      <div class="input-group-prepend">
-        <span class="input-group-text" id="inputGroup-sizing-default">
-          Port
-        </span>
-      </div>
-      <input
-        class="form-control port"
-        type="text"
-        id="port"
-        placeholder="Optional"
-        aria-label="Port"
-        aria-describedby="inputGroup-sizing-default"
-      />
-    </div>
-    <div class="input-group mr-3 mb-2">
-      <div class="input-group-prepend">
-        <span class="input-group-text" id="inputGroup-sizing-default">
-          IP
-        </span>
-      </div>
-      <input
-        type="text"
-        class="form-control ipAddress"
-        id="ipAddress"
-        placeholder="Optional"
-      />
-    </div>
-    <button
-      type="submit"
-      id="newPortButton"
-      class="btn btn-outline-primary mb-2 create"
-    >
-      Create
-    </button>
-  </div>
-  <small class="form-text text-muted"
-    >Port Number is not required. If you must, please make it > 3001</small
-  >
-  <hr />
-  <div class="row">
-    <div class="col-12">
-      <ul class="list-group domainList"></ul>
-    </div>
-  </div>
+  <div id="root"></div>
   <hr />
   <div class="row">
     <div class="col-12">

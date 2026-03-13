@@ -1,3 +1,7 @@
+type ContainerResponse = {
+  message?: string
+}
+
 const envList = helper.getElement('.envList')
 const environmentVariables: EnvironmentItem[] = []
 const fullDomain = window.location.pathname.split('/').pop()
