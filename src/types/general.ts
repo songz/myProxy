@@ -5,7 +5,7 @@ type Mapping = {
   port: string
   ip: string
   id: string
-  gitLink: string
+  description: string | null
   fullDomain: string
 }
 

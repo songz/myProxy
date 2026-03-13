@@ -4,6 +4,7 @@ export default {
   ADMIN_PASS: process.env.ADMIN || process.env.ENV || null,
   HOME: process.env.HOME || process.env.ENV || null,
   WORKPATH: process.env.WORKPATH || '/home/myproxy',
+  LOGPATH: process.env.LOGPATH || '/home/myproxy/logs',
   isProduction: (): boolean =>
     (process.env.NODE_ENV || process.env.ENV) === 'production'
 }

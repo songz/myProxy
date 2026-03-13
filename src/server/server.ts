@@ -1,6 +1,5 @@
 import 'dotenv/config'
 import express from 'express'
-import fs from 'fs'
 import https from 'https'
 import httpProxy from 'http-proxy'
 import path from 'path'
@@ -14,10 +13,6 @@ import { getAvailableDomains, getMappingByDomain } from '../lib/data'
 import { setPass, setupAuth, isCorrectCredentials } from '../auth'
 import { ProxyMapping } from '../types/general'
 import { SNICallback } from '../helpers/SNICallback'
-import { setAuthorizedKeys } from '../helpers/authorizedKeys'
-import environment from '../helpers/environment'
-
-const { isProduction } = environment
 
 // The steps below are covered by the setup script. This is not necessary.
 const cyan = '\x1b[36m\u001b[1m%s\x1b[0m'
@@ -35,20 +30,6 @@ const startAppServer = (
       return reject(errorMsg)
     }
     setPass(adminPass)
-
-    if (isProduction()) {
-      fs.readFile('/home/git/.ssh/authorized_keys', (error, data) => {
-        if (error) {
-          console.log(error)
-        }
-        setAuthorizedKeys(
-          data
-            .toString()
-            .split('\n')
-            .filter(e => e !== '')
-        )
-      })
-    }
 
     const app = express()
     app.use(express.json())
@@ -75,14 +56,6 @@ const startAppServer = (
       }
 
       return res.render('login', { error: 'Wrong Admin Password' })
-    })
-
-    app.get('/sshKeys', validUIAccess, (req, res) => {
-      res.render('sshKeys')
-    })
-
-    app.get('/manage/:domain', validUIAccess, (req, res) => {
-      res.render('manageDomain')
     })
 
     const server = app.listen(port, () => {

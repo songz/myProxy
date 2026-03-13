@@ -5,7 +5,7 @@ type Mapping = {
   ip: string
   port: string
   id: string
-  gitLink: string
+  description: string
   fullDomain: string
   status?: string
 }
@@ -48,18 +48,13 @@ class MappingItem {
     // The variables below are to hide log related icons when pm2 is not
     // being used to monitor the apps. These apps will not have status since
     // they are not managed by pm2.
-    let logClass
+    let logClass = 'fa fa-file-text-o ml-1 mt-1';
     if (data.status === 'running') {
       iconClass = 'fa fa-circle mr-1 mt-1'
       iconColor = 'rgba(50,255,50,0.5)'
-      logClass = 'fa fa-file-text-o ml-1 mt-1'
-    } else if (data.status === 'not started') {
-      iconClass = ''
-      iconColor = 'transparent'
     } else {
       iconClass = 'fa fa-circle mr-1 mt-1'
       iconColor = 'rgba(255, 50, 50, 0.5)'
-      logClass = 'fa fa-file-text-o ml-1 mt-1'
     }
     mappingElement.classList.add(
       'list-group-item',
@@ -81,39 +76,20 @@ class MappingItem {
           <a
             class="${logClass}"
             style="font-size: 15px; color: rgba(255,50,50,0.5)"
-            href="/api/logs/stderr/${data.fullDomain}"
+            href="/api/logs/error/${data.fullDomain}"
           >
           </a>
           <a
             class="${logClass}"
             style="font-size: 15px; color: rgba(40,167,70,0.5)"
-            href="/api/logs/stdout/${data.fullDomain}"
+            href="/api/logs/out/${data.fullDomain}"
           >
           </a>
         </div>
         <small class="form-text text-muted" style="display: inline-block;">
-          ${data.gitLink}
+          ${data.description}
         </small>
       </div>
-      <a
-        href="/manage/${data.fullDomain}"
-        class="btn btn-sm btn-outline-primary mr-3 manage-button"
-        role="button"
-      >
-        Manage
-      </a>
-      <button
-        class="btn btn-sm btn-outline-success mr-3 start-button"
-        type="button"
-      >
-        Start/Restart
-      </button>
-      <button
-        class="btn btn-sm btn-outline-warning mr-3 stop-button"
-        type="button"
-      >
-        Stop
-      </button>
       <button
         class="btn btn-sm btn-outline-danger mr-3 delete-button"
         type="button"
@@ -170,7 +146,7 @@ fetch('/api/mappings')
     mappings
       .reverse()
       .filter(
-        e => e.domain && e.port && e.id && e.gitLink && e.fullDomain && e.status
+        e => e.domain && e.port && e.id && e.fullDomain && e.status
       )
       .forEach(e => {
         new MappingItem(e)
