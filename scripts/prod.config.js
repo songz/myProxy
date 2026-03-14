@@ -1,7 +1,7 @@
 const path = require('path')
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') })
 
-module.exports = {
+const appConfig = {
   apps: [
     {
       name: 'myProxy-prod',
@@ -20,4 +20,12 @@ module.exports = {
       },
     },
   ],
+};
+
+if (process.env.LOGPATH) {
+  const fileName = process.env.DOMAIN || "myproxy";
+  appConfig.apps[0].out_file = path.join(process.env.LOGPATH, `${fileName}-out.log`);
+  appConfig.apps[0].error_file = path.join(process.env.LOGPATH, `${fileName}-error.log`);
 }
+
+module.exports = appConfig;
