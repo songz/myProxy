@@ -97,10 +97,10 @@ const startProxyServer = (): void => {
     }
   })
 
-  server.on('upgrade', function(req, socket) {
+  server.on('upgrade', function(req, socket, head) {
     const { ip, port }: ProxyMapping =
       getMappingByDomain(req.headers.host) || {}
-    if (port) return proxy.ws(req, socket, { target: `http://${ip}:${port}` })
+    if (port) return proxy.ws(req, socket, head, { target: `http://${ip}:${port}` })
   })
   server.listen(443)
   const httpApp = express()
