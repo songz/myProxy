@@ -69,7 +69,16 @@ const startAppServer = (
 
 const startProxyServer = (): void => {
   const proxy = httpProxy.createProxyServer({ xfwd: true })
-  proxy.on('error', err => console.error('Proxy error', err))
+  proxy.on('error', (err, _req, resOrSocket) => {
+    console.error('Proxy error', err.message)
+    if (!resOrSocket) return
+    if ('writeHead' in resOrSocket) {
+      if (!resOrSocket.headersSent) resOrSocket.writeHead(502)
+      resOrSocket.end('Bad Gateway')
+    } else {
+      resOrSocket.destroy()
+    }
+  })
 
   const server = https.createServer({ SNICallback }, (req, res) => {
     try {
@@ -98,9 +107,13 @@ const startProxyServer = (): void => {
   })
 
   server.on('upgrade', function(req, socket, head) {
+    socket.on('error', err =>
+      console.error('Upgrade socket error', req.headers.host, err.message)
+    )
     const { ip, port }: ProxyMapping =
       getMappingByDomain(req.headers.host) || {}
-    if (port) return proxy.ws(req, socket, head, { target: `http://${ip}:${port}` })
+    if (!port) return socket.destroy()
+    proxy.ws(req, socket, head, { target: `http://${ip}:${port}` })
   })
   server.listen(443)
   const httpApp = express()
