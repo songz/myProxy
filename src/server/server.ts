@@ -81,6 +81,12 @@ const startProxyServer = (): void => {
   })
 
   const server = https.createServer({ SNICallback }, (req, res) => {
+    req.on('error', err =>
+      console.error('Request error', req.headers.host, err.message)
+    )
+    res.on('error', err =>
+      console.error('Response error', req.headers.host, err.message)
+    )
     try {
       const { ip, port }: ProxyMapping =
         getMappingByDomain(req.headers.host) || {}
@@ -94,15 +100,23 @@ const startProxyServer = (): void => {
           preserveHeaderKeyCase: true
         },
         err => {
-          console.error('Error communicating with server', err)
-          res.end(
-            `Error communicating with server that runs ${req.headers.host}`
-          )
+          console.error('Error communicating with server', err.message)
+          if (!res.headersSent) res.writeHead(502)
+          if (res.writable) res.end('Bad Gateway')
         }
       )
     } catch (err) {
       console.error('Error: proxy failed', err)
-      return res.end(`Error: failed to create proxy ${req.headers.host}`)
+      if (res.writable) res.end(`Error: failed to create proxy ${req.headers.host}`)
+    }
+  })
+
+  server.on('clientError', (err, socket) => {
+    console.error('Client error', err.message)
+    if (socket.writable) {
+      socket.end('HTTP/1.1 400 Bad Request\r\n\r\n')
+    } else {
+      socket.destroy()
     }
   })
 
@@ -115,6 +129,7 @@ const startProxyServer = (): void => {
     if (!port) return socket.destroy()
     proxy.ws(req, socket, head, { target: `http://${ip}:${port}` })
   })
+  server.on('error', err => console.error('HTTPS server error', err.message))
   server.listen(443)
   const httpApp = express()
   httpApp.get('/*', (req, res) => {

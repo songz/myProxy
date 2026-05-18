@@ -8,7 +8,7 @@ const appConfig = {
       script: './build/app.js',
       log_date_format: "YYYY-MM-DD HH:mm:ss Z",
       instances: 1,
-      autorestart: false,
+      autorestart: true,
       cron_restart: '0 0 1 * *',
       watch: false,
       max_memory_restart: '1G',

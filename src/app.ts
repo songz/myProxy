@@ -3,6 +3,13 @@ import environment from './helpers/environment'
 
 const { PORT, ADMIN_PASS, isProduction } = environment
 
+process.on('uncaughtException', err =>
+  console.error('uncaughtException', err)
+)
+process.on('unhandledRejection', reason =>
+  console.error('unhandledRejection', reason)
+)
+
 startAppServer(PORT, ADMIN_PASS).catch(error =>
   console.error(`startAppServer: ${error}`)
 )
