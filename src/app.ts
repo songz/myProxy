@@ -3,9 +3,7 @@ import environment from './helpers/environment'
 
 const { PORT, ADMIN_PASS, isProduction } = environment
 
-process.on('uncaughtException', err =>
-  console.error('uncaughtException', err)
-)
+process.on('uncaughtException', err => console.error('uncaughtException', err))
 process.on('unhandledRejection', reason =>
   console.error('unhandledRejection', reason)
 )

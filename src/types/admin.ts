@@ -12,6 +12,7 @@ type DB = {
   mappings: Mapping[]
   availableDomains: Domain[]
   accessTokens: AccessToken[]
+  blacklistedIPs: string[]
 }
 
 export { ServiceKey, DB }
