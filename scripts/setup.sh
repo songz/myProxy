@@ -39,6 +39,6 @@ fi
 
 # Install hourly log-rotation cron job (idempotent).
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CRON_JOB="0 * * * * /usr/bin/env node ${SCRIPT_DIR}/rotate-logs.js >> /var/log/myproxy-rotate.log 2>&1"
+CRON_JOB="* * * * * /usr/bin/env node ${SCRIPT_DIR}/rotate-logs.js >> /var/log/myproxy-rotate.log 2>&1"
 ( crontab -l 2>/dev/null | grep -qF "rotate-logs.js" ) || \
   { crontab -l 2>/dev/null; echo "$CRON_JOB"; } | crontab -
