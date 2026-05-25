@@ -13,7 +13,8 @@ const data: DB = {
   serviceKeys: [],
   mappings: [],
   availableDomains: [],
-  accessTokens: []
+  accessTokens: [],
+  blacklistedIPs: []
 }
 
 let domainToMapping: MappingById = {}
@@ -37,6 +38,7 @@ try {
   data.mappings = fileData.mappings || []
   data.availableDomains = fileData.availableDomains || []
   data.accessTokens = fileData.accessTokens || []
+  data.blacklistedIPs = fileData.blacklistedIPs || []
 
   domainToMapping = createDomainCache(data.mappings)
   idToMapping = mapById(data.mappings)
@@ -107,6 +109,25 @@ const updateDomain = (domain: string, updatedMapping: Mapping): void => {
   setData('mappings', Object.values(domainToMapping))
 }
 
+const getBlacklistedIPs = (): string[] => {
+  return data.blacklistedIPs || []
+}
+
+const addBlacklistedIP = (ip: string): void => {
+  const list = getBlacklistedIPs()
+  if (!list.includes(ip)) {
+    setData('blacklistedIPs', [...list, ip])
+  }
+}
+
+const removeBlacklistedIP = (ip: string): void => {
+  setData('blacklistedIPs', getBlacklistedIPs().filter(i => i !== ip))
+}
+
+const isBlacklisted = (ip: string): boolean => {
+  return getBlacklistedIPs().includes(ip)
+}
+
 export {
   getData,
   setData,
@@ -118,5 +139,9 @@ export {
   getMappingById,
   getTokenById,
   deleteDomain,
-  updateDomain
+  updateDomain,
+  getBlacklistedIPs,
+  addBlacklistedIP,
+  removeBlacklistedIP,
+  isBlacklisted
 }

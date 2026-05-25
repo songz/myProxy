@@ -11,7 +11,11 @@ import { adminRouter } from '../admin/index'
 import { apiRouter } from '../api/index'
 import { validUIAccess } from '../helpers/authentication'
 import { hashPass } from '../helpers/crypto'
-import { getAvailableDomains, getMappingByDomain } from '../lib/data'
+import {
+  getAvailableDomains,
+  getMappingByDomain,
+  isBlacklisted
+} from '../lib/data'
 import { setPass, setupAuth, isCorrectCredentials } from '../auth'
 import { ProxyMapping } from '../types/general'
 import { SNICallback } from '../helpers/SNICallback'
@@ -88,6 +92,11 @@ const startProxyServer = (): void => {
       console.error('Response error', req.headers.host, err.message)
     )
     try {
+      const clientIP = req.socket.remoteAddress || ''
+      if (isBlacklisted(clientIP)) {
+        if (!res.headersSent) res.writeHead(403)
+        return res.end('Forbidden')
+      }
       const { ip, port }: ProxyMapping =
         getMappingByDomain(req.headers.host) || {}
       if (!port || !ip) return res.end('Not Found')
@@ -107,7 +116,8 @@ const startProxyServer = (): void => {
       )
     } catch (err) {
       console.error('Error: proxy failed', err)
-      if (res.writable) res.end(`Error: failed to create proxy ${req.headers.host}`)
+      if (res.writable)
+        res.end(`Error: failed to create proxy ${req.headers.host}`)
     }
   })
 
@@ -124,6 +134,8 @@ const startProxyServer = (): void => {
     socket.on('error', err =>
       console.error('Upgrade socket error', req.headers.host, err.message)
     )
+    const clientIP = socket.remoteAddress || ''
+    if (isBlacklisted(clientIP)) return socket.destroy()
     const { ip, port }: ProxyMapping =
       getMappingByDomain(req.headers.host) || {}
     if (!port) return socket.destroy()
