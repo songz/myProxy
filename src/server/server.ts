@@ -88,6 +88,12 @@ const startProxyServer = (): void => {
       console.error('Response error', req.headers.host, err.message)
     )
     try {
+      decodeURIComponent(req.url || '')
+    } catch {
+      res.writeHead(400)
+      return res.end('Bad Request')
+    }
+    try {
       const { ip, port }: ProxyMapping =
         getMappingByDomain(req.headers.host) || {}
       if (!port || !ip) return res.end('Not Found')
@@ -107,7 +113,8 @@ const startProxyServer = (): void => {
       )
     } catch (err) {
       console.error('Error: proxy failed', err)
-      if (res.writable) res.end(`Error: failed to create proxy ${req.headers.host}`)
+      if (res.writable)
+        res.end(`Error: failed to create proxy ${req.headers.host}`)
     }
   })
 
@@ -132,6 +139,14 @@ const startProxyServer = (): void => {
   server.on('error', err => console.error('HTTPS server error', err.message))
   server.listen(443)
   const httpApp = express()
+  httpApp.use((req, res, next) => {
+    try {
+      decodeURIComponent(req.path)
+      next()
+    } catch {
+      res.status(400).end()
+    }
+  })
   httpApp.get('/*', (req, res) => {
     const paramCheck = req.headers.host.split('?')[1]
     const params = paramCheck ? `?${paramCheck}` : ''
