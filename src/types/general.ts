@@ -74,6 +74,13 @@ type AccessToken = {
   id: string
 }
 
+type TokenRule = {
+  id: string
+  tokenId: string
+  fullDomain: string
+  path: string
+}
+
 type ProviderInfo = {
   name: string
   dns: string
@@ -96,5 +103,6 @@ export {
   AccessToken,
   AccessTokenById,
   AuthenticatedRequest,
-  ProviderInfo
+  ProviderInfo,
+  TokenRule
 }

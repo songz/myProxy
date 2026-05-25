@@ -11,7 +11,12 @@ import { adminRouter } from '../admin/index'
 import { apiRouter } from '../api/index'
 import { validUIAccess } from '../helpers/authentication'
 import { hashPass } from '../helpers/crypto'
-import { getAvailableDomains, getMappingByDomain } from '../lib/data'
+import {
+  getAvailableDomains,
+  getMappingByDomain,
+  findRuleForRequest,
+  getTokenById
+} from '../lib/data'
 import { setPass, setupAuth, isCorrectCredentials } from '../auth'
 import { ProxyMapping } from '../types/general'
 import { SNICallback } from '../helpers/SNICallback'
@@ -91,6 +96,20 @@ const startProxyServer = (): void => {
       const { ip, port }: ProxyMapping =
         getMappingByDomain(req.headers.host) || {}
       if (!port || !ip) return res.end('Not Found')
+
+      const rule = findRuleForRequest(req.headers.host, req.url || '/')
+      if (rule) {
+        const authHeader = req.headers['authorization'] || ''
+        const token = authHeader.startsWith('Bearer ')
+          ? authHeader.slice(7)
+          : authHeader
+        const validToken = getTokenById(rule.tokenId)
+        if (!validToken || token !== validToken.id) {
+          res.writeHead(401, { 'Content-Type': 'text/plain' })
+          return res.end('Unauthorized')
+        }
+      }
+
       proxy.web(
         req,
         res,
@@ -107,7 +126,8 @@ const startProxyServer = (): void => {
       )
     } catch (err) {
       console.error('Error: proxy failed', err)
-      if (res.writable) res.end(`Error: failed to create proxy ${req.headers.host}`)
+      if (res.writable)
+        res.end(`Error: failed to create proxy ${req.headers.host}`)
     }
   })
 
