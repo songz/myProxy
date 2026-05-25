@@ -15,6 +15,7 @@ import { getAvailableDomains, getMappingByDomain } from '../lib/data'
 import { setPass, setupAuth, isCorrectCredentials } from '../auth'
 import { ProxyMapping } from '../types/general'
 import { SNICallback } from '../helpers/SNICallback'
+import { rotateAllLogs } from '../helpers/logRotation'
 
 // The steps below are covered by the setup script. This is not necessary.
 const cyan = '\x1b[36m\u001b[1m%s\x1b[0m'
@@ -59,6 +60,10 @@ const startAppServer = (
 
       return res.render('login', { error: 'Wrong Admin Password' })
     })
+
+    // Rotate any oversized logs on startup; repeat every hour.
+    rotateAllLogs()
+    setInterval(rotateAllLogs, 60 * 60 * 1000)
 
     const server = app.listen(port, () => {
       console.log(cyan, `myProxy is running on port ${port}!`)
@@ -107,7 +112,8 @@ const startProxyServer = (): void => {
       )
     } catch (err) {
       console.error('Error: proxy failed', err)
-      if (res.writable) res.end(`Error: failed to create proxy ${req.headers.host}`)
+      if (res.writable)
+        res.end(`Error: failed to create proxy ${req.headers.host}`)
     }
   })
 
