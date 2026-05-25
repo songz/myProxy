@@ -107,7 +107,8 @@ const startProxyServer = (): void => {
       )
     } catch (err) {
       console.error('Error: proxy failed', err)
-      if (res.writable) res.end(`Error: failed to create proxy ${req.headers.host}`)
+      if (res.writable)
+        res.end(`Error: failed to create proxy ${req.headers.host}`)
     }
   })
 
