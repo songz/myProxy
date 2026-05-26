@@ -27,6 +27,12 @@ describe('/api/logs', () => {
     expect(logResponse.status).toEqual(200)
   })
 
+  it('checks that access log endpoint exists', async () => {
+    const fullDomain = 'Cloud.Walker.com'
+    const logResponse = await logAdapter(`/access/${fullDomain}`, 'GET')
+    expect(logResponse.status).toEqual(200)
+  })
+
   it('checks that unknown stream param returns an error', async () => {
     const fullDomain = 'Luke.Walker.com'
     const logResponse = await logAdapter(`/somestream/${fullDomain}`, 'GET')

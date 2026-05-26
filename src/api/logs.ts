@@ -5,7 +5,7 @@ import fs from 'fs'
 
 const logsRouter = express.Router()
 const { LOGPATH } = environment
-const VALID_STREAMS = ['stdout', 'stderr']
+const VALID_STREAMS = ['stdout', 'stderr', 'access']
 
 logsRouter.get('/:stream/:domain', async (req, res) => {
   const { stream, domain } = req.params

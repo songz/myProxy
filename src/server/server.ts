@@ -15,6 +15,7 @@ import { getAvailableDomains, getMappingByDomain } from '../lib/data'
 import { setPass, setupAuth, isCorrectCredentials } from '../auth'
 import { ProxyMapping } from '../types/general'
 import { SNICallback } from '../helpers/SNICallback'
+import { logProxyRequest } from '../middleware/requestLogger'
 
 // The steps below are covered by the setup script. This is not necessary.
 const cyan = '\x1b[36m\u001b[1m%s\x1b[0m'
@@ -81,6 +82,7 @@ const startProxyServer = (): void => {
   })
 
   const server = https.createServer({ SNICallback }, (req, res) => {
+    logProxyRequest(req, res)
     req.on('error', err =>
       console.error('Request error', req.headers.host, err.message)
     )
