@@ -10,5 +10,8 @@ adminRouter.get('/', (req, res) => {
 adminRouter.get('/accessTokens', (req, res) => {
   res.render('admin/accessTokens')
 })
+adminRouter.get('/tokenRules', (req, res) => {
+  res.render('admin/tokenRules')
+})
 
 export { adminRouter }

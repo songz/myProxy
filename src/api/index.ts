@@ -4,6 +4,7 @@ import logsRouter from './logs'
 import mappingRouter from './mapping'
 import sshKeyRouter from './sshKeys'
 import accessTokensRouter from './accessToken'
+import tokenRulesRouter from './tokenRules'
 import { getAvailableDomains } from '../lib/data'
 import { AuthenticatedRequest } from '../types/general'
 
@@ -24,6 +25,7 @@ apiRouter.use('/logs', logsRouter)
 apiRouter.use('/mappings', mappingRouter)
 apiRouter.use('/sshKeys', sshKeyRouter)
 apiRouter.use('/accessTokens', accessTokensRouter)
+apiRouter.use('/tokenRules', tokenRulesRouter)
 
 apiRouter.get('/availableDomains', (req, res) => {
   const domains = getAvailableDomains()

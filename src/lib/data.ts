@@ -6,14 +6,16 @@ import {
   MappingById,
   Domain,
   AccessToken,
-  AccessTokenById
+  AccessTokenById,
+  TokenRule
 } from '../types/general'
 
 const data: DB = {
   serviceKeys: [],
   mappings: [],
   availableDomains: [],
-  accessTokens: []
+  accessTokens: [],
+  tokenRules: []
 }
 
 let domainToMapping: MappingById = {}
@@ -37,6 +39,7 @@ try {
   data.mappings = fileData.mappings || []
   data.availableDomains = fileData.availableDomains || []
   data.accessTokens = fileData.accessTokens || []
+  data.tokenRules = fileData.tokenRules || []
 
   domainToMapping = createDomainCache(data.mappings)
   idToMapping = mapById(data.mappings)
@@ -85,6 +88,27 @@ const getAccessTokens = (): AccessToken[] => {
   return initialData || []
 }
 
+const getTokenRules = (): TokenRule[] => {
+  const initialData = getData('tokenRules')
+  return initialData || []
+}
+
+const findRuleForRequest = (
+  fullDomain: string,
+  path: string
+): TokenRule | undefined => {
+  const rules = getTokenRules()
+  return rules.find(rule => {
+    if (rule.fullDomain !== fullDomain) return false
+    if (!rule.path || rule.path === '/') return true
+    return (
+      path === rule.path ||
+      path.startsWith(rule.path.endsWith('/') ? rule.path : `${rule.path}/`) ||
+      path.startsWith(rule.path + '?')
+    )
+  })
+}
+
 const getMappingByDomain = (domain: string): Mapping => {
   return domainToMapping[domain]
 }
@@ -114,6 +138,8 @@ export {
   getMappings,
   getAvailableDomains,
   getAccessTokens,
+  getTokenRules,
+  findRuleForRequest,
   getMappingByDomain,
   getMappingById,
   getTokenById,
