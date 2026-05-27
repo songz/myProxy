@@ -16,6 +16,7 @@ import { setPass, setupAuth, isCorrectCredentials } from '../auth'
 import { ProxyMapping } from '../types/general'
 import { SNICallback } from '../helpers/SNICallback'
 import { logProxyRequest } from '../middleware/requestLogger'
+import { logTlsConnection } from '../middleware/tlsLogger'
 
 // The steps below are covered by the setup script. This is not necessary.
 const cyan = '\x1b[36m\u001b[1m%s\x1b[0m'
@@ -118,6 +119,10 @@ const startProxyServer = (): void => {
       if (res.writable)
         res.end(`Error: failed to create proxy ${req.headers.host}`)
     }
+  })
+
+  server.on('secureConnection', socket => {
+    logTlsConnection(socket)
   })
 
   server.on('clientError', (err, socket) => {
