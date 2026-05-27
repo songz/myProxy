@@ -2,6 +2,10 @@
 
 Scripts for analysing access logs to help identify suspicious traffic patterns.
 
+> For the timing utility used to diagnose where the autonomous coding agent
+> spends time during a fix, see [`scripts/agent-timing.sh`](../agent-timing.sh)
+> (`npm run timing`).
+
 ## ip-report.sh
 
 Groups all proxy requests by IP address and prints a frequency table, sorted by
